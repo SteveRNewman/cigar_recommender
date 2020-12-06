@@ -1,85 +1,89 @@
 #############version used on heroku###################
 import streamlit as st
 from PIL import Image
-#import models_app
-import pandas as pd 
+import model_app
+import pandas as pd
 
-
-#default_range =20
-
-#sidebars
-# st.sidebar.header('Info')
-# st.sidebar.text('subsection')
-
-#test/title
-st.title("Cigar Recommender")
-
+df_desc2 = pd.read_pickle('df_desc2.pkl')
+options5 = list(model_app.df_final_v_3.index)
+options5.append(' ')
+options = options5
+options2 = list(df_desc2.columns[:-1])
+st.markdown(
+    """<h1 style='display: block; text-align: center;' >Cigar Recommender</h1>
+    """,
+    unsafe_allow_html=True)
+col1, col2, col3 = st.beta_columns([1,1,1])
 img = Image.open('figures/cigar.jpeg')
-st.image(img, caption='“Smoking cigars is like falling in love. First, you are attracted by its shape; you stay for its flavor, and you must always remember never, never to let the flame go out.” - Winston Churchill')
+img2 = Image.open('figures/img2.jpeg')
+col2.image(img, use_column_width=True)
+st.image(img2, caption='“Smoking cigars is like falling in love. First, you are attracted by its shape; you stay for its flavor, and you must always remember never, never to let the flame go out.” Winston Churchill')
+test3 = st.radio('Choose how to get cigar recommendations:',['Enter Favorite Cigar Name', 'Enter Favorite Cigar Profile'])
+# if test3 == ('About'):
+# 	st.header('Info about the model - working on it. Will have features by type in sidebar with buttons to expand and displayed as graphs in the main section.')
+# 	wrapper = st.sidebar.button('View Wrapper Types')
+# 	filler = st.sidebar.button('View Filler Types')
+# 	strength = st.sidebar.button('View Strength Types')
+# 	st.sidebar.write('etc.')
+# 	test = None
+# 	test2 = None
+# 	html_string1 = "<a target='_blank' href = 'mailto: stevernewman@gmail.com'>Contact Steve</a>"
+# 	st.markdown(html_string1, unsafe_allow_html=True)
+if test3 == ('Enter Favorite Cigar Profile'):
 
-#header
-st.header('Input your favorite cigar.')
-st.subheader('You can search any cigars listed here, \n https://www.cigarsinternational.com/shop/big-list-of-cigars-brands/1803000/ ')
+		st.info('Select any number of profile keywords. Then select "Search Cigars" for new matches.')
+		profile = st.multiselect('Select only one strength option (all capitalized) for best results:', options2)
+		test2 = st.button('Search Cigars')
+		test = None
+else:
+	st.subheader('Enter your favorite cigar and autocomplete will provide selection.')
+	cigar_id = st.selectbox('Start typing cigar name', options, index=1616)
+	test = st.button('Search Cigars')
+	test2 = None
 
-#ask user for input
-cigar_id = st.text_input('Enter cigar name.')
+# else:
+# 	st.error('Please enter a valid cigar')
 
-#zip_code = st.text_input('Enter zip code to search for similar climbs in that area:', '92008')
-st.info('Or search by profile notes')
-profile = st.text_input('Enter profile keyword:', '')
-#state = st.text_input('Enter state to search in that area:', '')
+if test:
+	if cigar_id == (' '):
+		st.error('Please enter a valid cigar')
+	else:
+		st.success('Distance scores closer to zero are better matches because they have more similar features.')
+		query_index = model_app.get_key(val=cigar_id)
+		distances, indices = model_app.knn_search.kneighbors(model_app.df_final_v_3.iloc[query_index,:].values.reshape(1,-1), n_neighbors=11)
+		for i in range(0,len(distances.flatten())):
+			if i == 0:
+				st.write('Top Cigar Recommendations for: {}'.format(model_app.df_final_v_3.index[query_index]))
+				st.write(' Profile notes: {}'.format(df_desc2['New'][query_index][:-1]))
+				html_string1 = "<a target='_blank' href='http://google.com/search?q={}+cigar&rlz'>more info</a>".format(model_app.df_final_v_3.index[query_index].replace("'",""))
+				st.markdown(html_string1, unsafe_allow_html=True)
+			else:
+				p2 = model_app.df_final_v_3.index[indices.flatten()[i]]
+				st.write('{}: {} with a Distance Score of: {}'.format(i, model_app.df_final_v_3.index[indices.flatten()[i]],round(distances.flatten()[i],4)))
+				st.write(' Profile notes: {}'.format(df_desc2['New'][p2][:-1]))
+				html_string = "<a target='_blank' href='http://google.com/search?q={}+cigar&rlz'>more info</a>".format(model_app.df_final_v_3.index[indices.flatten()[i]].replace("'",""),round(distances.flatten()[i],4))
+				st.markdown(html_string, unsafe_allow_html=True)
+		st.success('Finished')
 
-#st.text('Lastly, enter the search radius (defaults to 20 miles)')
-#radius_range = st.number_input('Enter radius to search in specified area:', default_range)
+	# else:
+	# 	st.error('Please enter a valid cigar')
 
-
-#once button pressed we check for input errors and start search
-test = st.button('Search for recommended cigars')
-# pd.set_option('max_colwidth', 100)
-
-#run recommender
-# if test:
-# 	if climb_id:
-# 		#spinner
-# 		#below lines show we are done
-# 		if len(climb_id)>10:
-# 			climb_id = climb_id.split('/')[-2]
-# 		#else we have climb id lets look it up
-# 		st.success('Searching for similar climbs in that area')
-# 		#call function and pass id, city, state, zip and radius
-# 		#fxn returns df of 10 most similar climbs in search range
-# 		st.dataframe(models_app.get_wrecked(target_id=climb_id, target_state=state,target_city=city,
-# 			target_zipcode=zip_code,target_radius_range=radius_range,star_limit=3.5))
-# 		st.success('Finished')
-# 		st.balloons()
-# 		#RUN recommender
-# 	else:
-# 		st.error('Please enter a valid ID/url into the climb id box')
-# 		#ERROR please input a target climb
-
-
-# img2 = Image.open('figures/09A21D41-981D-4FC1-A359-74653420A488_1_105_c.jpeg')
-# st.image(img2, caption='View of the Witch in the Needles, CA')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+if test2:
+	if profile:
+		st.success('Select "Search Cigars" again for new options if more than 10 matches are available.')
+		targets = profile
+		df_desc2['pro'] = pd.DataFrame(df_desc2.New.apply(lambda sentence: all(word in sentence for word in targets)))
+		df = pd.DataFrame(df_desc2['New'][df_desc2['pro']==True])
+		if len(df)>10:
+			df=df.sample(n=10)
+		for i in range(len(df)):
+			st.write('{}: {}'.format(i+1,df.index[i]))
+			st.write('---Profile notes: {}'.format(df["New"][i][:-1]))
+			html_string = "<a target='_blank' href='http://google.com/search?q={}+cigar&rlz'>more info</a>".format(df.index[i].replace("'",""))
+			st.markdown(html_string, unsafe_allow_html=True)
+html_stringp = "<a target='_blank' href='https://chefnewman.github.io/'>About</a>"
+# st.markdown(html_stringp, unsafe_allow_html=True)
+st.markdown(
+    """<a target='_blank;' style='display: block; text-align: center;' href="https://chefnewman.github.io/">About</a>
+    """,
+    unsafe_allow_html=True)
