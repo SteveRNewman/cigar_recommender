@@ -1,8 +1,0 @@
-[core]
-	repositoryformatversion = 0
-	filemode = true
-	bare = true
-	ignorecase = true
-	precomposeunicode = true
-[remote "origin"]
-	url = https://github.com/chefnewman/dsc-capstone-project-v2-online-ds-pt-100719.git
