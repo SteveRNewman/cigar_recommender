@@ -37,7 +37,7 @@ if test3 == ('Enter Favorite Cigar Profile'):
 		test = None
 else:
 	st.subheader('Enter your favorite cigar and autocomplete will provide selection.')
-	cigar_id = st.selectbox('Start typing cigar name', options, index=1616)
+	cigar_id = st.selectbox('Start typing cigar name', options, index=1612)
 	test = st.button('Search Cigars')
 	test2 = None
 
