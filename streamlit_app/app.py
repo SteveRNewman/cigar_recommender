@@ -4,6 +4,8 @@ from PIL import Image
 import model_app
 import pandas as pd
 
+st.set_page_config(page_title="Cigars-Rec", page_icon="💨" , layout="centered")
+
 df_desc2 = pd.read_pickle('df_desc2.pkl')
 options5 = list(model_app.df_final_v_3.index)
 options5.append(' ')
@@ -82,8 +84,11 @@ if test2:
 			html_string = "<a target='_blank' href='http://google.com/search?q={}+cigar&rlz'>more info</a>".format(df.index[i].replace("'",""))
 			st.markdown(html_string, unsafe_allow_html=True)
 html_stringp = "<a target='_blank' href='https://chefnewman.github.io/'>About</a>"
-# st.markdown(html_stringp, unsafe_allow_html=True)
 st.markdown(
     """<a target='_blank;' style='display: block; text-align: center;' href="https://chefnewman.github.io/">About</a>
     """,
     unsafe_allow_html=True)
+fb = st.checkbox("Comments", value=False)
+if fb:
+    st.components.v1.iframe("https://s3.us-east-2.amazonaws.com/cigars-rec.com/discuss.html", height=400, scrolling=True)
+    st.components.v1.iframe("https://s3.us-east-2.amazonaws.com/cigars-rec.com/disqus.html",height=400, scrolling=True)
