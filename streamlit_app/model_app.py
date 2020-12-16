@@ -9,7 +9,6 @@ warnings.filterwarnings("ignore")
 
 df_final_v_3 = pd.read_pickle('df_final_v_3.pkl')
 
-
 knn_search = NearestNeighbors(metric='wminkowski', p=2, metric_params={'w': [1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
        1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
        1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
@@ -36,3 +35,4 @@ def get_key(val):
     for key, value in dict(enumerate(options)).items():
          if val == value:
             return key
+
