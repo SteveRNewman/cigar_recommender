@@ -8,25 +8,36 @@ import random
 st.set_page_config(page_title="Cigars-Rec", page_icon="💨" , layout="centered")
 
 whisky_tbl = pd.read_pickle('w_join2.pkl')
+#whisky_tbl = pd.read_pickle('w_join2.pkl')
 cigar_tbl = pd.read_pickle('df_desc2.pkl')
 def_cigar_tbl = pd.read_pickle('c_def_list.pkl')
 wky_to_cgr = pd.read_pickle('wky_to_cgr.pkl')
+wky_to_cgr2 = pd.read_pickle('wky_to_cgr2.pkl')
 
 cigar_lst = list(model_app.df_final_v_3.index)
 cigar_lst.append(' ')
 whsky_lst = list(whisky_tbl.index)
 whsky_lst.append(' ')
+whsky_lst2 = list(wky_to_cgr2.index)
+whsky_lst2.append(' ')
 
 options = cigar_lst
+options0 = whsky_lst2
 options1 = whsky_lst
 options2 = list(cigar_tbl.columns[:-1])
 options3 = list(whisky_tbl.columns[:-1])
 options4 = list(wky_to_cgr.columns[:-2])
+options5 = list(wky_to_cgr2.columns[:-2])
 options10 = list(whisky_tbl.index)
-
+options11 = list(wky_to_cgr2.index)
 
 def get_key2(val):
     for key, value in dict(enumerate(options10)).items():
+         if val == value:
+            return key
+
+def get_key3(val):
+    for key, value in dict(enumerate(options11)).items():
          if val == value:
             return key
 
@@ -41,7 +52,7 @@ img2 = Image.open('figures/img2.jpeg')
 col2.image(img, use_column_width=True)
 st.image(img2, caption='“Smoking cigars is like falling in love. First, you are attracted by its shape; you stay for its flavor, and you must always remember never, never to let the flame go out.” Winston Churchill')
 
-home_btn = st.selectbox('Choose how to get cigar recommendations:',['Instructions','Enter Favorite Cigar Name', 'Enter Favorite Cigar Profile', 'Match Cigar to Whisky', 'Match Whisky to Cigar',' '], index=5)
+home_btn = st.radio('',['Instructions','Enter Favorite Cigar Name', 'Enter Favorite Cigar Profile','Match Cigar to Whisky', 'Match Whisky to Cigar'],index=1)
 
 if home_btn == ('Instructions'):
 
@@ -159,55 +170,105 @@ if home_btn == ('Match Cigar to Whisky'):
 				srch_cigar_btn = None
 
 if home_btn == ('Match Whisky to Cigar'):
-
-	st.subheader('Enter your favorite whisky and autocomplete will provide selection.  \n (If your favorite whisky is missing from the list, leave a note in the comments and I will add it in.)')
-	whisky_id = st.selectbox('Start typing whisky name', options1, index=2404)
-	srch_profile_btn = None
-	whisky_btn = None
-	w_srch_cigar = None
-	if whisky_id:
-		if whisky_id == (' '):
-			st.error('Please enter a valid whisky')
-		else:
-			#st.success('Distance scores closer to zero are better matches because they have more similar features.')
-			query_index = get_key2(val=whisky_id)
-			st.write('Whisky to match to cigar: {}'.format(whisky_tbl.index[query_index]))
-			st.write(' Profile notes: {}'.format(whisky_tbl['new'][query_index][:-1]))
-			html_string1 = "<a target='_blank' href='http://google.com/search?q={}+distiller.com&rlz'>Whisky Info`</a>".format(whisky_tbl.index[query_index].replace("'",""))
-			st.markdown(html_string1, unsafe_allow_html=True)
-			cig_list= wky_to_cgr['w_targ_l'][query_index]
-			if cig_list == ['']:
-				st.error('No Matches')
-				c_profile = None
+	prefer = st.checkbox('Preferred Whisky Only')
+	if prefer:
+		st.subheader('Enter your favorite whisky and autocomplete will provide selection.  \n (If your favorite whisky is missing from the list, leave a note in the comments and I will add it in.)')
+		whisky_id = st.selectbox('Start typing whisky name', options0, index=227)
+		srch_profile_btn = None
+		whisky_btn = None
+		w_srch_cigar = None
+		if whisky_id:
+			if whisky_id == (' '):
+				st.error('Please enter a valid whisky')
 			else:
-				cig_list = cig_list
-				c_profile = st.multiselect('Select cigar profile notes', options4, default=cig_list)
+				#st.success('Distance scores closer to zero are better matches because they have more similar features.')
+				query_index = get_key3(val=whisky_id)
+				st.write('Whisky to match to cigar: {}'.format(wky_to_cgr2.index[query_index]))
+				st.write(' Profile notes: {}'.format(wky_to_cgr2['New'][query_index][:-1]))
+				html_string1 = "<a target='_blank' href='http://google.com/search?q={}+distiller.com&rlz'>Whisky Info`</a>".format(whisky_tbl.index[query_index].replace("'",""))
+				st.markdown(html_string1, unsafe_allow_html=True)
+				cig_list= wky_to_cgr2['w_targ_l'][query_index]
+				if cig_list == ['']:
+					st.error('No Matches')
+					c_profile = None
+				else:
+					cig_list = cig_list
+					c_profile = st.multiselect('Select cigar profile notes', options4, default=cig_list)
 
-			srch_cigar_btn = None
+				srch_cigar_btn = None
 
-			st.experimental_set_query_params(my_saved_result=c_profile)
-			app_state = st.experimental_get_query_params()  
-			#st.write(f'{w_profile2}')		
-			w_profile2 = app_state["my_saved_result"]
-			#st.write(f'{w_profile2}')
-			whky_cgr_btn = st.button('Search Cigars')		
-			if whky_cgr_btn:
-				if w_profile2:
-					st.success('Select "Search Cigars" again for new options if more than 10 matches are available.')
-					st.success('Whiskys have more profile notes than cigars. Delete down to your top 4 profile notes for more cigar selections.')
-					w_targets = w_profile2
-					cigar_tbl['pro'] = pd.DataFrame(cigar_tbl.New.apply(lambda sentence: all(word in sentence for word in w_targets)))
-					c_df = pd.DataFrame(cigar_tbl['New'][cigar_tbl['pro']==True])
-					if len(c_df)>10:
-						c_df=c_df.sample(n=10)
-					for i in range(len(c_df)):
-						st.write('{}: {}'.format(i+1,c_df.index[i]))
-						st.write('---Profile notes: {}'.format(c_df["New"][i][:-1]))
-						html_string = "<a target='_blank' href='http://google.com/search?q={}+cigar&rlz'>Cigar Info</a>".format(c_df.index[i].replace("'",""))
-						st.markdown(html_string, unsafe_allow_html=True)
-					
-			srch_profile_btn = None
-			srch_cigar_btn = None
+				st.experimental_set_query_params(my_saved_result=c_profile)
+				app_state = st.experimental_get_query_params()  
+				#st.write(f'{w_profile2}')		
+				w_profile2 = app_state["my_saved_result"]
+				#st.write(f'{w_profile2}')
+				whky_cgr_btn = st.button('Search Cigars')		
+				if whky_cgr_btn:
+					if w_profile2:
+						st.success('Select "Search Cigars" again for new options if more than 10 matches are available.')
+						st.success('Whiskys have more profile notes than cigars. Delete down to your top 4 profile notes for more cigar selections.')
+						w_targets = w_profile2
+						cigar_tbl['pro'] = pd.DataFrame(cigar_tbl.New.apply(lambda sentence: all(word in sentence for word in w_targets)))
+						c_df = pd.DataFrame(cigar_tbl['New'][cigar_tbl['pro']==True])
+						if len(c_df)>10:
+							c_df=c_df.sample(n=10)
+						for i in range(len(c_df)):
+							st.write('{}: {}'.format(i+1,c_df.index[i]))
+							st.write('---Profile notes: {}'.format(c_df["New"][i][:-1]))
+							html_string = "<a target='_blank' href='http://google.com/search?q={}+cigar&rlz'>Cigar Info</a>".format(c_df.index[i].replace("'",""))
+							st.markdown(html_string, unsafe_allow_html=True)
+						
+				srch_profile_btn = None
+				srch_cigar_btn = None
+	else:		
+		st.subheader('Enter your favorite whisky and autocomplete will provide selection.  \n (If your favorite whisky is missing from the list, leave a note in the comments and I will add it in.)')
+		whisky_id = st.selectbox('Start typing whisky name', options1, index=2404)
+		srch_profile_btn = None
+		whisky_btn = None
+		w_srch_cigar = None
+		if whisky_id:
+			if whisky_id == (' '):
+				st.error('Please enter a valid whisky')
+			else:
+				#st.success('Distance scores closer to zero are better matches because they have more similar features.')
+				query_index = get_key2(val=whisky_id)
+				st.write('Whisky to match to cigar: {}'.format(whisky_tbl.index[query_index]))
+				st.write(' Profile notes: {}'.format(whisky_tbl['new'][query_index][:-1]))
+				html_string1 = "<a target='_blank' href='http://google.com/search?q={}+distiller.com&rlz'>Whisky Info`</a>".format(whisky_tbl.index[query_index].replace("'",""))
+				st.markdown(html_string1, unsafe_allow_html=True)
+				cig_list= wky_to_cgr['w_targ_l'][query_index]
+				if cig_list == ['']:
+					st.error('No Matches')
+					c_profile = None
+				else:
+					cig_list = cig_list
+					c_profile = st.multiselect('Select cigar profile notes', options4, default=cig_list)
+
+				srch_cigar_btn = None
+
+				st.experimental_set_query_params(my_saved_result=c_profile)
+				app_state = st.experimental_get_query_params()  
+				#st.write(f'{w_profile2}')		
+				w_profile2 = app_state["my_saved_result"]
+				#st.write(f'{w_profile2}')
+				whky_cgr_btn = st.button('Search Cigars')		
+				if whky_cgr_btn:
+					if w_profile2:
+						st.success('Select "Search Cigars" again for new options if more than 10 matches are available.')
+						st.success('Whiskys have more profile notes than cigars. Delete down to your top 4 profile notes for more cigar selections.')
+						w_targets = w_profile2
+						cigar_tbl['pro'] = pd.DataFrame(cigar_tbl.New.apply(lambda sentence: all(word in sentence for word in w_targets)))
+						c_df = pd.DataFrame(cigar_tbl['New'][cigar_tbl['pro']==True])
+						if len(c_df)>10:
+							c_df=c_df.sample(n=10)
+						for i in range(len(c_df)):
+							st.write('{}: {}'.format(i+1,c_df.index[i]))
+							st.write('---Profile notes: {}'.format(c_df["New"][i][:-1]))
+							html_string = "<a target='_blank' href='http://google.com/search?q={}+cigar&rlz'>Cigar Info</a>".format(c_df.index[i].replace("'",""))
+							st.markdown(html_string, unsafe_allow_html=True)
+						
+				srch_profile_btn = None
+				srch_cigar_btn = None
 
 html_stringp = "<a target='_blank' href='https://chefnewman.github.io/'>About</a>"
 st.markdown(
