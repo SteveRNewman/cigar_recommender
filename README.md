@@ -14,16 +14,16 @@ Cigars International Website https://www.cigarsinternational.com/
 
 ## Process Details
 There are four notebooks in this repository:
-    1. Acquire Data
+1. Acquire Data
         In this notebook all the webscraping is executed. Specifically, product names, attributes, and text descriptions are stored in a dictionary and then prepared for EDA in a dataframe.
 
-    2. EDA
+2. EDA
         This notebook is dedicated to finding what the data looks like and preparing it for processing. Examples of processes included in this section include finding null values, creating dataframes of relevant attributes, encoding and imputing to fill null values, visualizing attribute qualities, and creating a WordCloud of the most relevant product descriptive words. At the end of this notebook there is a section dedicated to NLP analysis of text data that was not used in the final model.
 
-    3. Processing
+3. Processing
         The processing notebook expands off the EDA section by standardizing the data and scaling it in order to be used in a model. Count vectorization and MinMax scaling were employed on attributes that had many variations.
 
-    4. Model
+4. Model
         This notebook deployed a k-nearest neighbors algorithm with a weighted Minkowski metric. The weights are used to give less weight to flavor characteristics and more weight to sweet and flavored attributes. Cigars that are sweet or flavored are distinctly different from traditional cigars. The final section of this notebook is dedicated to preparing the data to be used in a web based application.
 
 ## Conclusions 
