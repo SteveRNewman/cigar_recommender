@@ -1,2 +1,4 @@
 .DS_store
 .ipynb_checkpoints
+data
+notebooks/scratch_notebooks
