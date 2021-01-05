@@ -5,14 +5,14 @@ import model_app
 import pandas as pd
 import random 
 
-st.set_page_config(page_title="Cigars-Rec", page_icon="💨" , layout="centered")
+st.set_page_config(page_title="Cigars-Rec", page_icon="💨" , layout='centered')
 
 whisky_tbl = pd.read_pickle('w_join2.pkl')
 #whisky_tbl = pd.read_pickle('w_join2.pkl')
 cigar_tbl = pd.read_pickle('df_desc2.pkl')
 def_cigar_tbl = pd.read_pickle('c_def_list.pkl')
 wky_to_cgr = pd.read_pickle('wky_to_cgr.pkl')
-wky_to_cgr2 = pd.read_pickle('wky_to_cgr2.pkl')
+wky_to_cgr2 = pd.read_pickle('final_pref.pkl')
 
 cigar_lst = list(model_app.df_final_v_3.index)
 cigar_lst.append(' ')
@@ -173,7 +173,7 @@ if home_btn == ('Match Whisky to Cigar'):
 	prefer = st.checkbox('Preferred Whisky Only')
 	if prefer:
 		st.subheader('Enter your favorite whisky and autocomplete will provide selection.  \n (If your favorite whisky is missing from the list, leave a note in the comments and I will add it in.)')
-		whisky_id = st.selectbox('Start typing whisky name', options0, index=227)
+		whisky_id = st.selectbox('Start typing whisky name', options0, index=1593)
 		srch_profile_btn = None
 		whisky_btn = None
 		w_srch_cigar = None
@@ -184,8 +184,8 @@ if home_btn == ('Match Whisky to Cigar'):
 				#st.success('Distance scores closer to zero are better matches because they have more similar features.')
 				query_index = get_key3(val=whisky_id)
 				st.write('Whisky to match to cigar: {}'.format(wky_to_cgr2.index[query_index]))
-				st.write(' Profile notes: {}'.format(wky_to_cgr2['New'][query_index][:-1]))
-				html_string1 = "<a target='_blank' href='http://google.com/search?q={}+distiller.com&rlz'>Whisky Info`</a>".format(whisky_tbl.index[query_index].replace("'",""))
+				st.write(' Profile notes: {}'.format(wky_to_cgr2['wky_to_cgr2'][query_index][:-1]))
+				html_string1 = "<a target='_blank' href='http://google.com/search?q={}+distiller.com&rlz'>Whisky Info</a>".format(wky_to_cgr2.index[query_index].replace("'",""))
 				st.markdown(html_string1, unsafe_allow_html=True)
 				cig_list= wky_to_cgr2['w_targ_l'][query_index]
 				if cig_list == ['']:
@@ -234,7 +234,7 @@ if home_btn == ('Match Whisky to Cigar'):
 				query_index = get_key2(val=whisky_id)
 				st.write('Whisky to match to cigar: {}'.format(whisky_tbl.index[query_index]))
 				st.write(' Profile notes: {}'.format(whisky_tbl['new'][query_index][:-1]))
-				html_string1 = "<a target='_blank' href='http://google.com/search?q={}+distiller.com&rlz'>Whisky Info`</a>".format(whisky_tbl.index[query_index].replace("'",""))
+				html_string1 = "<a target='_blank' href='http://google.com/search?q={}+distiller.com&rlz'>Whisky Info</a>".format(whisky_tbl.index[query_index].replace("'",""))
 				st.markdown(html_string1, unsafe_allow_html=True)
 				cig_list= wky_to_cgr['w_targ_l'][query_index]
 				if cig_list == ['']:
